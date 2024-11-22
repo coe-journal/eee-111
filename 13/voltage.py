@@ -72,6 +72,7 @@ def __main__():
 	axis.plot(t, vr)
 	axis.plot(t, vl)
 	axis.plot(t, vc)
+	figure.legend(["V_R", "V_L", "V_C"])
 	plot.show()
 
 
