@@ -10,7 +10,7 @@ import math
 class Arguments:
 	@classmethod
 	def from_str(cls, frequency1: str, frequency2: str, duration: str, points: str, bits: str) -> "Arguments":
-		return Arguments(float(frequency1), float(frequency2), float(duration), int(points), validate_bitstring(bits))
+		return Arguments(float(frequency1), float(frequency2), float(duration), int(points), bitstring_to_bools(bits))
 
 	def __iter__(self):
 		return iter(astuple(self))
@@ -19,15 +19,22 @@ class Arguments:
 	frequency2: float
 	duration: float
 	points: int
-	bits: str
+	bits: list[bool]
 
 
 
-def validate_bitstring(bits: str) -> str:
-	if all(b in "01" for b in bits):
-		return bits
+def bit_to_bool(bit: str) -> bool:
+	if bit == '0':
+		return False
+	elif bit == '1':
+		return True
 
-	raise ValueError("Invalid characters in bitstring.")
+	raise ValueError("Invalid character.")
+
+def bitstring_to_bools(bits: str) -> list[bool]:
+	return [bit_to_bool(b) for b in bits]
+
+
 
 
 
