@@ -33,7 +33,7 @@ def input_arguments(prompt: str) -> Arguments:
 	if len(split) <= 3:
 		split.append("")
 
-	return Arguments.from_str(*split)
+	return Arguments.from_str(*split[:4])
 
 
 
