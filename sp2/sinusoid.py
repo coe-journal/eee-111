@@ -28,12 +28,22 @@ def input_list(prompt: str) -> list[str]:
 	return [s for s in input(prompt).split()]
 
 def input_arguments(prompt: str) -> Arguments:
-	split = input_list(prompt)
+	while split := input_list(prompt):
+		if len(split) == 3:
+			split.append("")
 
-	if len(split) <= 3:
-		split.append("")
+		if len(split) >= 4:
+			try:
+				return Arguments.from_str(*split[:4])
+			except:
+				print("Invalid arguments.")
+				continue
 
-	return Arguments.from_str(*split[:4])
+		print("Invalid number of arguments.")
+
+	assert False, "unreachable"
+
+
 
 
 
