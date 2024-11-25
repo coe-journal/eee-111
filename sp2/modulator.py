@@ -9,15 +9,25 @@ import math
 @dataclass
 class Arguments:
 	@classmethod
-	def from_str(cls, frequency: str, duration: str, points: str) -> "Arguments":
-		return Arguments(float(frequency), float(duration), int(points))
+	def from_str(cls, frequency1: str, frequency2: str, duration: str, points: str, bits: str) -> "Arguments":
+		return Arguments(float(frequency1), float(frequency2), float(duration), int(points), validate_bitstring(bits))
 
 	def __iter__(self):
 		return iter(astuple(self))
 
-	frequency: float
+	frequency1: float
+	frequency2: float
 	duration: float
 	points: int
+	bits: str
+
+
+
+def validate_bitstring(bits: str) -> str:
+	if all(b in "01" for b in bits):
+		return bits
+
+	raise ValueError("Invalid characters in bitstring.")
 
 
 
@@ -26,9 +36,11 @@ def input_list(prompt: str) -> list[str]:
 
 def input_arguments(prompt: str) -> Arguments:
 	while split := input_list(prompt):
-		if len(split) >= 3:
+		if len(split) >= 4:
 			try:
-				return Arguments.from_str(*split[:3])
+				split = split[:4]
+				split.append(input(prompt))
+				return Arguments.from_str(*split)
 			except:
 				print("Invalid arguments.")
 				continue
@@ -61,13 +73,7 @@ def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> li
 
 
 def __main__():
-	frequency, duration, points = input_arguments("> ")
-
-	time = range_points(0, duration, points)
-	voltage = sine_wave(1, frequency, time)
-
-	for t, v in zip(time, voltage):
-		print(f"{t:.6f} {v:.6f}")
+	frequency1, frequency2, duration, points, bits = input_arguments("> ")
 
 
 
