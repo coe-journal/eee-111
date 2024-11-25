@@ -52,12 +52,7 @@ def range_points(start: float, end: float, points: int) -> list[float]:
 
 
 def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> list[float]:
-	out: list[float] = []
-
-	for timepoint in timepoints:
-		out.append(amplitude * math.sin(2 * math.pi * frequency * timepoint))
-
-	return out
+	return [amplitude * math.sin(2 * math.pi * frequency * timepoint) for timepoint in timepoints]
 
 
 
