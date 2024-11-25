@@ -23,15 +23,30 @@ class Arguments:
 def input_list(prompt: str) -> list[str]:
 	return [s for s in input(prompt).split()]
 
-def input_args(prompt: str) -> Arguments:
+def input_arguments(prompt: str) -> Arguments:
 	split = input_list(prompt)
 	return Arguments.from_str(*split)
 
 
 
+def range_points(start: float, end: float, points: int) -> list[float]:
+	out = list[float]()
+	step = (end - start) / (points - 1)
+
+	while True:
+		out.append(start)
+		start += step
+		if start > end:
+			break
+
+	return out
+
+
+
 def __main__():
-	args = input_args("> ")
-	print(args)
+	args = input_arguments("> ")
+
+	print(range_points(0, 0.001, 9))
 
 
 
