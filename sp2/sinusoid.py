@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: MPL-2.0
 
 from dataclasses import astuple, dataclass
-
 import math
+
+import matplotlib.pyplot as plot
 
 
 
@@ -11,7 +12,7 @@ import math
 class Arguments:
 	@classmethod
 	def from_str(cls, frequency: str, duration: str, points: str, show: str) -> "Arguments":
-		return Arguments(float(frequency), float(duration), int(points), show == "true")
+		return Arguments(float(frequency), float(duration), int(points), show == "show")
 
 	def __iter__(self):
 		return iter(astuple(self))
@@ -30,7 +31,7 @@ def input_arguments(prompt: str) -> Arguments:
 	split = input_list(prompt)
 
 	if len(split) <= 3:
-		split.append("false")
+		split.append("")
 
 	return Arguments.from_str(*split)
 
@@ -40,11 +41,11 @@ def range_points(start: float, end: float, points: int) -> list[float]:
 	out: list[float] = []
 	step = (end - start) / (points - 1)
 
-	while True:
-		out.append(start)
-		start += step
-		if start > end:
-			break
+	current = start
+	while current < end:
+		out.append(current)
+		current += step
+	out.append(current)
 
 	return out
 
@@ -60,6 +61,13 @@ def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> li
 
 
 
+def plot_lists(x: list[float], y: list[float]) -> None:
+	figure, axis = plot.subplots()
+	axis.plot(x, y)
+	plot.show()
+
+
+
 def __main__():
 	frequency, duration, points, show = input_arguments("> ")
 
@@ -67,7 +75,10 @@ def __main__():
 	voltage = sine_wave(1, frequency, time)
 
 	for t, v in zip(time, voltage):
-		print(t, v)
+		print(f"{t:.6f} {v:.6f}")
+
+	if show:
+		plot_lists(time, voltage)
 
 
 
