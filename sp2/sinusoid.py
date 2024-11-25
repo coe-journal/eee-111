@@ -28,6 +28,10 @@ def input_list(prompt: str) -> list[str]:
 
 def input_arguments(prompt: str) -> Arguments:
 	split = input_list(prompt)
+
+	if len(split) <= 3:
+		split.append("false")
+
 	return Arguments.from_str(*split)
 
 
