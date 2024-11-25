@@ -36,8 +36,6 @@ def bitstring_to_bools(bits: str) -> list[bool]:
 
 
 
-
-
 def input_list(prompt: str) -> list[str]:
 	return [s for s in input(prompt).split()]
 
@@ -55,8 +53,6 @@ def input_arguments(prompt: str) -> Arguments:
 		print("Invalid number of arguments.")
 
 	assert False, "unreachable"
-
-
 
 
 

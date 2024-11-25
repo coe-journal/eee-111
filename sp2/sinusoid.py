@@ -39,8 +39,6 @@ def input_arguments(prompt: str) -> Arguments:
 
 
 
-
-
 def range_points(start: float, end: float, points: int) -> list[float]:
 	out: list[float] = []
 	step = (end - start) / (points - 1)
