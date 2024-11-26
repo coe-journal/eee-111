@@ -4,13 +4,15 @@
 from dataclasses import astuple, dataclass
 import math
 
+import matplotlib.pyplot as plot
+
 
 
 @dataclass
 class Arguments:
 	@classmethod
-	def from_str(cls, frequency: str, duration: str, points: str) -> "Arguments":
-		return Arguments(float(frequency), float(duration), int(points))
+	def from_str(cls, frequency: str, duration: str, points: str, show: str) -> "Arguments":
+		return Arguments(float(frequency), float(duration), int(points), show == "show")
 
 	def __iter__(self):
 		return iter(astuple(self))
@@ -18,6 +20,7 @@ class Arguments:
 	frequency: float
 	duration: float
 	points: int
+	show: bool
 
 
 
@@ -26,9 +29,12 @@ def input_list(prompt: str) -> list[str]:
 
 def input_arguments(prompt: str) -> Arguments:
 	while split := input_list(prompt):
-		if len(split) >= 3:
+		if len(split) == 3:
+			split.append("")
+
+		if len(split) >= 4:
 			try:
-				return Arguments.from_str(*split[:3])
+				return Arguments.from_str(*split[:4])
 			except:
 				print("Invalid arguments.")
 				continue
@@ -58,14 +64,26 @@ def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> li
 
 
 
+def plot_data(data: dict[float, float], xlabel: str, ylabel: str) -> None:
+	figure, axis = plot.subplots()
+	axis.plot(list(data.keys()), list(data.values()))
+	plot.xlabel(xlabel)
+	plot.ylabel(ylabel)
+	plot.show()
+
+
+
 def __main__():
-	frequency, duration, points = input_arguments("> ")
+	frequency, duration, points, show = input_arguments("> ")
 
 	time = range_points(0, duration, points)
 	voltage = sine_wave(1, frequency, time)
 
 	for t, v in zip(time, voltage):
 		print(f"{t:.6f} {v:.6f}")
+
+	if show:
+		plot_data(dict(zip(time, voltage)), "Time (s)", "Voltage (V)")
 
 
 

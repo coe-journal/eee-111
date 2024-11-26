@@ -4,13 +4,15 @@
 from dataclasses import astuple, dataclass
 import math
 
+import matplotlib.pyplot as plot
+
 
 
 @dataclass
 class Arguments:
 	@classmethod
-	def from_str(cls, frequency0: str, frequency1: str, duration: str, points: str, bits: str) -> "Arguments":
-		return Arguments(float(frequency0), float(frequency1), float(duration), int(points), bitstring_to_bools(bits))
+	def from_str(cls, frequency0: str, frequency1: str, duration: str, points: str, show: str, bits: str) -> "Arguments":
+		return Arguments(float(frequency0), float(frequency1), float(duration), int(points), show == "show", bitstring_to_bools(bits))
 
 	def __iter__(self):
 		return iter(astuple(self))
@@ -19,6 +21,7 @@ class Arguments:
 	frequency1: float
 	duration: float
 	points: int
+	show: bool
 	bits: list[bool]
 
 
@@ -41,9 +44,12 @@ def input_list(prompt: str) -> list[str]:
 
 def input_arguments(prompt: str) -> Arguments:
 	while split := input_list(prompt):
-		if len(split) >= 4:
+		if len(split) == 4:
+			split.append("")
+
+		if len(split) >= 5:
 			try:
-				split = split[:4]
+				split = split[:5]
 				split.append(input(prompt))
 				return Arguments.from_str(*split)
 			except:
@@ -75,8 +81,17 @@ def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> li
 
 
 
+def plot_data(data: dict[float, float], xlabel: str, ylabel: str) -> None:
+	figure, axis = plot.subplots()
+	axis.plot(list(data.keys()), list(data.values()))
+	plot.xlabel(xlabel)
+	plot.ylabel(ylabel)
+	plot.show()
+
+
+
 def __main__():
-	frequency0, frequency1, duration, points, bits = input_arguments("> ")
+	frequency0, frequency1, duration, points, show, bits = input_arguments("> ")
 
 
 
