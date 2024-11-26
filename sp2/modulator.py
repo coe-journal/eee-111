@@ -9,14 +9,14 @@ import math
 @dataclass
 class Arguments:
 	@classmethod
-	def from_str(cls, frequency1: str, frequency2: str, duration: str, points: str, bits: str) -> "Arguments":
-		return Arguments(float(frequency1), float(frequency2), float(duration), int(points), bitstring_to_bools(bits))
+	def from_str(cls, frequency0: str, frequency1: str, duration: str, points: str, bits: str) -> "Arguments":
+		return Arguments(float(frequency0), float(frequency1), float(duration), int(points), bitstring_to_bools(bits))
 
 	def __iter__(self):
 		return iter(astuple(self))
 
+	frequency0: float
 	frequency1: float
-	frequency2: float
 	duration: float
 	points: int
 	bits: list[bool]
@@ -76,7 +76,7 @@ def sine_wave(amplitude: float, frequency: float, timepoints: list[float]) -> li
 
 
 def __main__():
-	frequency1, frequency2, duration, points, bits = input_arguments("> ")
+	frequency0, frequency1, duration, points, bits = input_arguments("> ")
 
 
 
