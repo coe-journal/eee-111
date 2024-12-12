@@ -148,6 +148,15 @@ def plot_fsk(freq0: float, freq1: float, dur: float, pts: int) -> bool:
 	return True
 
 def out_fsk(freq0: float, freq1: float, dur: float, pts: int, filename: str) -> bool:
+	if parsed := parse_rules(
+		[Rule([Transform(bitstring, 0)])],
+		input_list("> ")
+	):
+		bits = parsed[0]
+		tv = fsk(freq0, freq1, dur, pts, bits)
+		with open(filename, "w") as file:
+			for t, v in tv:
+				print(f"{t:.9f} {v:.9f}", file=file)
 
 	return True
 
