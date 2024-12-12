@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: 0BSD
 
 from dataclasses import dataclass
+from itertools import pairwise
 from typing import Any, Callable
 
 
@@ -74,16 +75,12 @@ def print_crossing(pts: int) -> bool:
 
 			tv.append((t, v))
 
+	tv = [xy for xy in tv if xy[1] != 0]
+
 	crossings = 0
-	current = tv[0][1]
-	for _, v in tv[1:]:
-		if v == 0:
-			continue
-
-		if current * v < 0:
+	for x, y in pairwise(tv):
+		if x[1] * y[1] < 0:
 			crossings += 1
-
-		current = v
 
 	print(crossings)
 
