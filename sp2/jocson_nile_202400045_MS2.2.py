@@ -128,8 +128,9 @@ def help_string(info: str | None = None) -> bool:
 		info = ""
 
 	print(f"""{ info }Usage:
-	<pts:int>               Demodulates the given FSK signal.
-	<t:float> <v:float> ...
+	<pts:int> <bits:int>    Demodulates the given FSK signal.
+	<t:float> <v:float>
+	...
 	help                    Prints this message.
 	exit                    Exits the program."""
 	)

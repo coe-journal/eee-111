@@ -103,8 +103,9 @@ def help_string(info: str | None = None) -> bool:
 		info = ""
 
 	print(f"""{ info }Usage:
-	<pts:int>               Outputs the number of zero-crossings in the given time-value signal.
-	<t:float> <v:float> ...
+	<pts:int>               Outputs the number of zero-crossings in the given signal.
+	<t:float> <v:float>
+	...
 	help                    Prints this message.
 	exit                    Exits the program."""
 	)

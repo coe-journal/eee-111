@@ -1,0 +1,285 @@
+\documentclass{article}
+
+
+
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+
+
+\title{SP2 Documentation}
+\author{Nile Jocson \textless{}novoseiversia@gmail.com\textgreater{}}
+\date{\today}
+
+
+
+\begin{document}
+	\maketitle
+		\pagebreak
+
+
+
+	\tableofcontents
+		\pagebreak
+
+
+
+	\section{Git}
+		The Git repository for this project can be found at
+		\url{https://github.com/coe-journal/eee-111/tree/main/sp2}.
+
+		\pagebreak
+
+
+
+	\section{Documentation}
+		\subsection{Usage}
+			\subsubsection{Milestone 1.1}
+				\begin{itemize}
+					\item \verb|<freq:float> <dur:float> <pts:int>| \\
+						--- Generates the time-voltage format of a sine wave.
+					\item \verb|<freq:float> <dur:float> <pts:int> plot| \\
+						--- Same as the first, but shows a plot of the wave.
+					\item \verb|<freq:float> <dur:float> <pts:int> out <filename:str>| \\
+						--- Same as the first, but saves the values into a file.
+				\end{itemize}
+
+			\subsubsection{Milestone 1.2}
+				\begin{itemize}
+					\item \verb|<freq0:float> <freq1:float> <dur:float> <pts:int>| \\
+						\verb|<bits:str>| \\
+						--- Generates the time-voltage format of a sine wave.
+					\item \verb|<freq0:float> <freq1:float> <dur:float> <pts:int> plot| \\
+						\verb|<bits:str>| \\
+						--- Same as the first, but shows a plot of the wave.
+					\item \verb|<freq0:float> <freq1:float> <dur:float> <pts:int> out <filename:str>| \\
+						\verb|<bits:str>| \\
+						--- Same as the first, but saves the values into a file.
+				\end{itemize}
+
+			\subsubsection{Milestone 1.3}
+				\begin{itemize}
+					\item \verb|<pts:int>| \\
+						\verb|<t:float> <v:float>| \\
+						\verb|...| \\
+						--- Outputs the number of zero-crossings in the given signal.
+				\end{itemize}
+
+			\subsubsection{Milestone 1.4}
+				\begin{itemize}
+					\item \verb|<pts:int> <bits:int>| \\
+						\verb|<t:float> <v:float>| \\
+						\verb|...| \\
+						--- Demodulates the given FSK signal.
+				\end{itemize}
+
+			\subsubsection{Common Commands}
+				\begin{itemize}
+					\item \verb|help| \\
+						--- Prints the help text.
+					\item \verb|exit| \\
+						--- Exits the program.
+				\end{itemize}
+
+			\pagebreak
+
+
+
+		\subsection{Parsing}
+			Parsing is handled by the \verb|parse_rules| utilities that were
+			written for my SP1 submission.
+
+			\pagebreak
+
+
+
+		\subsection{Time-Value}
+			\begin{verbatim}
+def time_value(
+	f: Callable[[float], float],
+	start: float,
+	end: float,
+	points: int
+) -> list[tuple[float, float]]:
+			\end{verbatim}
+
+			\subsubsection{Behavior}
+				The output of a function \verb|f| in time-value format can be generated using
+				the \verb|time_value()| function. This returns a list of time-value pairs where
+				\verb|t| are \verb|points| amount of numbers between and including \verb|start| and \verb|end|,
+				and \verb|v| is equal to \verb|f(t)| for every \verb|t|.
+
+				This function can also be used for functions with multiple parameters using
+				\verb|itertools.partial()|. For example, with a sine function:
+
+				\begin{verbatim}
+from itertools import partial
+
+def sine(
+	frequency: float,
+	phase_shift: float,
+	t: float
+) -> float:
+	return math.sin(2 * math.pi * frequency * (t + phase_shift))
+
+time_value(partial(sine, frequency, phase_shift), ...)
+				\end{verbatim}
+
+				However, do note that \verb|t| must be the last parameter of the function in order to be
+				compatible with \verb|time_value()|.
+
+			\subsubsection{Mechanics}
+				\verb|time_value()| simply initializes an empty list of tuples of two floats, iterates through
+				\verb|t in arange(start, end, points)|, appends \verb|(t, f(t))| into the list, and returns it.
+
+			\pagebreak
+
+
+
+		\subsection{FSK Modulation}
+			\begin{verbatim}
+def fsk(
+	frequency0: float,
+	frequency1: float,
+	duration: float,
+	points: int,
+	bits: str
+) -> list[tuple[float, float]]:
+			\end{verbatim}
+
+			\subsubsection{Behavior}
+				The time-value format of an FSK signal representing a specified bit sequence
+				can be generated using \verb|fsk()|. This returns a list of time-value pairs with \verb|points|
+				amount of time points between and including \verb|t = 0| and \verb|t = duration|. Each bit in
+				the sequence is represented by a sine wave with a frequency of \verb|frequency0| or \verb|frequency1|
+				if the bit is \verb|0| or \verb|1|, respectively. Note that the sine wave has a phase-shift
+				such that they start at \verb|v = 0| for each bit, and that the last value will also be \verb|v = 0|.
+
+			\subsubsection{Mechanics}
+				\verb|fsk()| initizliaes an empty list of tuples of two floats,
+				and calculates the endpoints of \verb|t| for each bit using \verb|arange(0, duration, n + 1)|
+				where \verb|n = len(bits)|. It then iterates through \verb|i in range(n)|, initializing the following
+				variables:
+
+				\begin{itemize}
+					\item \verb|start = endpoints[i]|.
+					\item \verb|end = endpoints[i + 1]|.
+					\item \verb|frequency = frequency0| or \verb|frequency1| depending on the bit as described before.
+				\end{itemize}
+
+				The list is then extended using \verb|time_value()| from \verb|start| to \verb|end| with \verb|points \\ n + 1|
+				points (an additional point is added because of a limitation of \verb|arange()|, which will be discussed later),
+				using a sine function with a frequency of \verb|frequency| and a phase-shift of \verb|(start - end) * i|, which
+				will make the wave start at \verb|v = 0|.
+
+				After each iteration, the extra point in the list is popped. After the whole iteration, the list is appended
+				with \verb|(duration, 0)|. The list is then returned.
+
+			\pagebreak
+
+
+
+		\subsection{Zero Crossings}
+			\begin{verbatim}
+def count_crossings(
+	tv: list[tuple[float, float]]
+) -> int:
+			\end{verbatim}
+
+			\subsubsection{Behavior}
+				The \verb|count_crossings()| function simply returns the number of zero-crossings in the given time-value input.
+				Touching zero does not count.
+
+			\subsubsection{Mechanics}
+				\verb|count_crossings()| first removes all time-value pairs in the input where \verb|v = 0|. Then, for each
+				consecutive pair of time-value pairs, it checks if zero has been crossed in the two values by multiplying them
+				and checking their sign. If the sign is negative, then zero has been crossed, and a counter is incremented.
+
+				Note that the definition of a zero-crossing is that for two variables \(a\) and \(b\), \(a > 0, b < 0\) or
+				\(a < 0, b > 0\). Since the signs of the two variables always differ, the sign of their product is always
+				negative, i.e.\ \(ab < 0\).
+
+				The counter is then returned after the iteration.
+
+			\pagebreak
+
+
+
+		\subsection{FSK Demodulation}
+			\begin{verbatim}
+def demodulate(
+	bits: int,
+	tv: list[tuple[float, float]]
+) -> list[bool]:
+			\end{verbatim}
+
+			\subsubsection{Behavior}
+				The \verb|demodulate()| function demodulates a the time-value representation of an FSK-modulated signal by counting
+				the number of zero-crossings and estimating the frequency of each division of the signal based on the given number of
+				bits. The mean of all frequencies is then calculated, and this becomes the threshold frequency. If the frequency of a
+				given division is higher than the threshold frequency, the bit that is represented by that division is a \verb|1|.
+				Otherwise, the bit is \verb|0|. The demodulated bit sequence is then returned.
+
+			\subsubsection{Mechanics}
+				\verb|demodulate()| initializes an empty list of booleans, which will be the demodulated bit sequence. It then removes
+				all time-value pairs in the input where \verb|v = 0|, and then initializes the following variables:
+
+				\begin{itemize}
+					\item \verb|duration| is the duration of the FSK signal.
+					\item \verb|bit_duration| is the duration of each bit in the signal.
+					\item \verb|crossings| is an empty list which will contain the number of crossings for each division of the signal.
+					\item \verb|bit = 0|.
+				\end{itemize}
+
+				It then iterates with each pair of consecutive time-value pairs, counting each zero-crossing in the current division of
+				the signal. If the \verb|t| of the first pair is above the end-time of the current division, \verb|bit| is incremented,
+				moving on to the next division of the signal. This is calculated using \verb|bit_duration * (bit + 1)|. However, \verb|bit|
+				is not incremented if it is already the last division of the signal (this is to support the final extra point in the
+				time-value representation).
+
+				The frequencies are then calculated by \verb|(c / 2) / bit_duration| for the number of crossings of each division \verb|c|.
+				The threshold frequency is calculated by getting the mean of the list of frequencies. It then iterates through each frequency;
+				if the frequency is above the threshold, \verb|True| is appended to the bit sequence, otherwise, \verb|False| is appended.
+				The demodulated bit sequence is then returned.
+
+			\pagebreak
+
+
+
+		\subsection{Other Utilities}
+			\subsubsection{Sine}
+				The \verb|sine()| function returns the value of \verb|sin| given a frequency in Hz, a phase-shift in seconds, and a time
+				in seconds. This is calculated using \(\sin(2\pi f(t - c))\), where \(f\) is the frequency, \(c\) is the phase-shift, and
+				\(t\) is the time.
+
+			\subsubsection{Print Functions}
+				The \verb|print_x()| functions simply prints the output of its corresponding milestone function, i.e. \verb|time_value()|, \verb|fsk()|,
+				\verb|count_crossings()|, and \verb|demodulate()|. It also handles multiline input for all milestones except milestone 1.1.
+
+			\subsubsection{Plot Functions}
+				For milestones 1.1 and 1.2, the \verb|plot_x()| functions simply plots the output of its corresponding milestone function using
+				\verb|matplotlib|.
+
+			\subsubsection{Out Functions}
+				For milestones 1.1 and 1.2, the \verb|out_x()| functions simply writes the output of its corresponding milestone function into a given file.
+
+			\subsubsection{Help and Exit}
+				In each program, inputting \verb|help| will print out the help text, and inputting \verb|exit| will exit the program.
+
+			\pagebreak
+
+
+
+		\subsection{General Questions}
+			\subsubsection{What was your general approach for the software project?}
+				I simply made a dedicated function and file for each milestone. Since each milestone is a simple input-output problem,
+				no state is required, so I didn't use any classes (except for the structs in the \verb|parse_rules| library, which
+				don't contain state and are simply there for cleanliness). I copy-pasted the \verb|parse_rules| library from my last
+				software project, since I think that it is a good, clean and concise way to define the inputs and how they are parsed
+				for each line. Other than than, not really anything out-of-the-ordinary in how I coded this project.
+
+			\subsubsection{How was your experience in programming?}
+				To be completely honest, I was absolutely burnt out making this. Cramming the whole thing in under one day since I couldn't
+				get the motivation after back-to-back projects and exams. While I love programming, sometimes it just isn't it. Otherwise,
+				I thought the course was good. The discussion could be more hands-on and not simply a lecture on the topic for the week though.
+\end{document}
