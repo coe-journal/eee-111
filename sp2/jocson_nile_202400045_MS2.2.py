@@ -62,11 +62,6 @@ def try_commandspecs(specs: list[CommandSpec], command: list[str], default: Call
 
 
 
-def within(lower: float, upper: float, x: float) -> bool:
-	return lower < x < upper
-
-
-
 def print_demodulate(pts: int, bits: int) -> bool:
 	tv: list[tuple[float, float]] = []
 
