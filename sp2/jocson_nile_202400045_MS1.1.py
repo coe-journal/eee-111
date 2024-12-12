@@ -79,8 +79,8 @@ def arange(start: float, end: float, points: int) -> list[float]:
 
 
 
-def sine(frequency: float, t: float) -> float:
-	return math.sin(2 * math.pi * frequency * t)
+def sine(frequency: float, phase_shift: float, t: float) -> float:
+	return math.sin(2 * math.pi * frequency * (t + phase_shift))
 
 def time_value(f: Callable[[float], float], start: float, end: float, points: int) -> list[tuple[float, float]]:
 	tv: list[tuple[float, float]] = []
@@ -93,14 +93,14 @@ def time_value(f: Callable[[float], float], start: float, end: float, points: in
 
 
 def print_sine(freq: float, dur: float, pts: int) -> bool:
-	tv = time_value(partial(sine, freq), 0, dur, pts)
+	tv = time_value(partial(sine, freq, 0), 0, dur, pts)
 	for t, v in tv:
 		print(f"{t:.9f} {v:.9f}")
 
 	return True
 
 def plot_sine(freq: float, dur: float, pts: int) -> bool:
-	tv = time_value(partial(sine, freq), 0, dur, pts)
+	tv = time_value(partial(sine, freq, 0), 0, dur, pts)
 	figure, axis = plot.subplots()
 	axis.plot(*zip(*tv))
 	plot.show()
@@ -108,7 +108,7 @@ def plot_sine(freq: float, dur: float, pts: int) -> bool:
 	return True
 
 def out_sine(freq: float, dur: float, pts: int, filename: str) -> bool:
-	tv = time_value(partial(sine, freq), 0, dur, pts)
+	tv = time_value(partial(sine, freq, 0), 0, dur, pts)
 	with open(filename, "w") as file:
 		for t, v in tv:
 			print(f"{t:.9f} {v:.9f}", file=file)

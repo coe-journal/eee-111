@@ -62,6 +62,18 @@ def try_commandspecs(specs: list[CommandSpec], command: list[str], default: Call
 
 
 
+def count_crossings(tv: list[tuple[float, float]]) -> int:
+	no_zeroes = [xy for xy in tv if xy[1] != 0]
+
+	crossings = 0
+	for x, y in pairwise(no_zeroes):
+		if x[1] * y[1] < 0:
+			crossings += 1
+
+	return crossings
+
+
+
 def print_crossing(pts: int) -> bool:
 	tv: list[tuple[float, float]] = []
 
@@ -75,12 +87,7 @@ def print_crossing(pts: int) -> bool:
 
 			tv.append((t, v))
 
-	tv = [xy for xy in tv if xy[1] != 0]
-
-	crossings = 0
-	for x, y in pairwise(tv):
-		if x[1] * y[1] < 0:
-			crossings += 1
+	crossings = count_crossings(tv)
 
 	print(crossings)
 

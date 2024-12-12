@@ -62,6 +62,36 @@ def try_commandspecs(specs: list[CommandSpec], command: list[str], default: Call
 
 
 
+def demodulate(bits: int, tv: list[tuple[float, float]]) -> list[bool]:
+	sequence: list[bool] = []
+
+	no_zeroes = [xy for xy in tv if xy[1] != 0]
+
+	duration = no_zeroes[-1][0]
+	bit_duration = duration / bits
+
+	crossings: list[int] = [0] * bits
+	bit = 0
+	for x, y in pairwise(no_zeroes):
+		if x[0] > bit_duration * (bit + 1) and bit < bits - 1:
+			bit += 1
+
+		if x[1] * y[1] < 0:
+			crossings[bit] += 1
+
+	frequencies = [(c / 2) / bit_duration for c in crossings]
+	threshold = sum(frequencies) / len(frequencies)
+	for f in frequencies:
+		if f > threshold:
+			sequence.append(True)
+
+		else:
+			sequence.append(False)
+
+	return sequence
+
+
+
 def print_demodulate(pts: int, bits: int) -> bool:
 	tv: list[tuple[float, float]] = []
 
@@ -75,28 +105,16 @@ def print_demodulate(pts: int, bits: int) -> bool:
 
 			tv.append((t, v))
 
-	tv = [xy for xy in tv if xy[1] != 0]
+	sequence = demodulate(bits, tv)
 
-	duration = tv[-1][0]
-	bit_duration = duration / bits
-
-	crossings: list[int] = [0] * bits
-	bit = 0
-	for x, y in pairwise(tv):
-		if x[0] > bit_duration * (bit + 1) and bit < bits - 1:
-			bit += 1
-
-		if x[1] * y[1] < 0:
-			crossings[bit] += 1
-
-	frequencies = [(c / 2) / bit_duration for c in crossings]
-	threshold = sum(frequencies) / len(frequencies)
-	for f in frequencies:
-		if f > threshold:
+	for bit in sequence:
+		if bit:
 			print("1", end="")
 
 		else:
 			print("0", end="")
+
+	print()
 
 	return True
 

@@ -80,7 +80,7 @@ def arange(start: float, end: float, points: int) -> list[float]:
 
 
 def sine(frequency: float, phase_shift: float, t: float) -> float:
-	return math.sin(2 * math.pi * frequency * (t - phase_shift))
+	return math.sin(2 * math.pi * frequency * (t + phase_shift))
 
 def time_value(f: Callable[[float], float], start: float, end: float, points: int) -> list[tuple[float, float]]:
 	tv: list[tuple[float, float]] = []
@@ -104,7 +104,7 @@ def fsk(frequency0: float, frequency1: float, duration: float, points: int, bits
 		if bits[i] == "1":
 			frequency = frequency1
 
-		fsk.extend(time_value(partial(sine, frequency, (end - start) * i), start, end, points // n + 1))
+		fsk.extend(time_value(partial(sine, frequency, (start - end) * i), start, end, points // n + 1))
 		fsk.pop()
 
 	fsk.append((duration, 0))
